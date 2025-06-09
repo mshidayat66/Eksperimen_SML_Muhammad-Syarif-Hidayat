@@ -69,3 +69,12 @@ def preprocess_data(data, target_column, save_path, file_path):
     print(f"Preprocessing pipeline disimpan ke: {save_path}")
 
     return X_train, X_test, y_train, y_test
+
+if __name__ == "__main__":
+    target_column = "Personality"
+    save_path = "preprocessing/preprocessor_pipeline.joblib"
+    file_path = "personality_dataset_raw.csv"
+    output_path = "preprocessing/personality_dataset_preprocessing.csv"
+
+    data = pd.read_csv(file_path)
+    preprocess_data(data, target_column, save_path, output_path)
