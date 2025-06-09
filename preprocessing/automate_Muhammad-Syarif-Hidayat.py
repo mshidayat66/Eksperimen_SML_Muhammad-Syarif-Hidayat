@@ -5,8 +5,9 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 from sklearn.model_selection import train_test_split
 from joblib import dump
 import pandas as pd
+import numpy as np
 
-def preprocess_data(data, target_column, save_path, file_path):
+def preprocess_data(data, target_column, save_path, output_path):
     # Drop duplikat sebelum preprocessing
     print("Jumlah duplikasi sebelum drop:", data.duplicated().sum())
     data = data.drop_duplicates().reset_index(drop=True)
@@ -22,12 +23,6 @@ def preprocess_data(data, target_column, save_path, file_path):
     if target_column in categorical_features:
         categorical_features.remove(target_column)
     
-    # Simpan nama kolom fitur (tanpa target)
-    column_names = data.columns.drop(target_column)
-    df_header = pd.DataFrame(columns=column_names)
-    df_header.to_csv(file_path, index=False)
-    print(f"Nama kolom berhasil disimpan ke: {file_path}")
-
     # Pipeline untuk fitur numerik (imputer + scaler)
     numeric_transformer = Pipeline(steps=[
         ('imputer', SimpleImputer(strategy='mean')),
@@ -60,15 +55,26 @@ def preprocess_data(data, target_column, save_path, file_path):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=24)
 
     # Fitting dan transformasi pada train
-    X_train = preprocessor.fit_transform(X_train)
+    X_train_transformed = preprocessor.fit_transform(X_train)
     # Transformasi pada test
-    X_test = preprocessor.transform(X_test)
+    X_test_transformed = preprocessor.transform(X_test)
+
+    # Gabungkan X_train dan y_train
+    train_data = np.hstack((X_train_transformed, y_train.reshape(-1, 1)))
+
+    # Ambil nama-nama kolom hasil transformasi
+    feature_names = preprocessor.get_feature_names_out()
+    all_columns = list(feature_names) + [target_column]
+
+    # Simpan ke file CSV
+    pd.DataFrame(train_data, columns=all_columns).to_csv(output_path, index=False)
+    print(f"Dataset hasil preprocessing disimpan ke: {output_path}")
 
     # Simpan pipeline preprocessing ke file
     dump(preprocessor, save_path)
     print(f"Preprocessing pipeline disimpan ke: {save_path}")
 
-    return X_train, X_test, y_train, y_test
+    return X_train_transformed, X_test_transformed, y_train, y_test
 
 if __name__ == "__main__":
     target_column = "Personality"
