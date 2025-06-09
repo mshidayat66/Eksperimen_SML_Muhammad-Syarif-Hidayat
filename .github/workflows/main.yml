@@ -1,0 +1,37 @@
+name: Data Preprocessing Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run preprocessing script
+        run: |
+          python preprocessing/automate_Muhammad-Syarif-Hidayat.py
+
+      - name: Commit and push processed data
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add preprocessing/personality_dataset_preprocessing.csv
+          git commit -m "Update processed dataset" || echo "No changes to commit"
+          git push
