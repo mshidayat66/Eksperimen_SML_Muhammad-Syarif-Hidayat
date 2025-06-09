@@ -76,13 +76,13 @@ def preprocess_data(data, target_column, save_path, file_path):
     return X_train_processed, X_test_processed, y_train, y_test
 
 if __name__ == "__main__":
-    input_path = "personality_dataset_raw.csv"
+    file_path = "personality_dataset_raw.csv"
     output_path = "preprocessing/personality_dataset_preprocessing.csv"
-    model_path = "preprocessing/preprocessor_pipeline.joblib"
+    save_path = "preprocessing/preprocessor_pipeline.joblib"
     target_column = "personality"  # Ganti sesuai kolom target kamu
 
-    if not os.path.exists(input_path):
-        raise FileNotFoundError(f"File input tidak ditemukan: {input_path}")
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File input tidak ditemukan: {file_path}")
 
-    data = pd.read_csv(input_path)
-    preprocess_data(data, target_column, model_path, output_path)
+    data = pd.read_csv(file_path)
+    preprocess_data(data, target_column, save_path, output_path)
