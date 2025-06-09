@@ -79,7 +79,7 @@ if __name__ == "__main__":
     file_path = "personality_dataset_raw.csv"
     output_path = "preprocessing/personality_dataset_preprocessing.csv"
     save_path = "preprocessing/preprocessor_pipeline.joblib"
-    target_column = "personality"  # Ganti sesuai kolom target kamu
+    target_column = "Personality"  # Ganti sesuai kolom target kamu
 
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File input tidak ditemukan: {file_path}")
