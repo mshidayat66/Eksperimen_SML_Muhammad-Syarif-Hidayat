@@ -28,10 +28,14 @@ jobs:
         run: |
           python preprocessing/automate_Muhammad-Syarif-Hidayat.py
 
+      - name: Authenticate with GitHub
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+
       - name: Commit and push processed data
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
           git add preprocessing/personality_dataset_preprocessing.csv
-          git commit -m "Update processed dataset" || echo "No changes to commit"
+          git commit -m "Update processed dataset by GitHub Actions" || echo "No changes to commit"
           git push
