@@ -5,7 +5,6 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, LabelEncoder
 from sklearn.model_selection import train_test_split
 from joblib import dump
 import pandas as pd
-import os
 
 def preprocess_data(data, target_column, save_path, file_path):
     # Drop duplikat sebelum preprocessing
@@ -16,13 +15,13 @@ def preprocess_data(data, target_column, save_path, file_path):
     # Menentukan fitur numerik dan kategoris
     numeric_features = data.select_dtypes(include=['float64', 'int64']).columns.tolist()
     categorical_features = data.select_dtypes(include=['object']).columns.tolist()
-
+    
     # Pastikan target_column tidak masuk ke fitur
     if target_column in numeric_features:
         numeric_features.remove(target_column)
     if target_column in categorical_features:
         categorical_features.remove(target_column)
-
+    
     # Simpan nama kolom fitur (tanpa target)
     column_names = data.columns.drop(target_column)
     df_header = pd.DataFrame(columns=column_names)
@@ -61,28 +60,12 @@ def preprocess_data(data, target_column, save_path, file_path):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=24)
 
     # Fitting dan transformasi pada train
-    X_train_processed = preprocessor.fit_transform(X_train)
-    X_test_processed = preprocessor.transform(X_test)
+    X_train = preprocessor.fit_transform(X_train)
+    # Transformasi pada test
+    X_test = preprocessor.transform(X_test)
 
     # Simpan pipeline preprocessing ke file
     dump(preprocessor, save_path)
     print(f"Preprocessing pipeline disimpan ke: {save_path}")
 
-    # Simpan hasil transformasi ke CSV agar bisa dilacak di Git
-    df_processed = pd.DataFrame(X_train_processed)
-    df_processed.to_csv(file_path, index=False)
-    print(f"Hasil preprocessing disimpan ke: {file_path}")
-
-    return X_train_processed, X_test_processed, y_train, y_test
-
-if __name__ == "__main__":
-    file_path = "personality_dataset_raw.csv"
-    output_path = "preprocessing/personality_dataset_preprocessing.csv"
-    save_path = "preprocessing/preprocessor_pipeline.joblib"
-    target_column = "Personality"  # Ganti sesuai kolom target kamu
-
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File input tidak ditemukan: {file_path}")
-
-    data = pd.read_csv(file_path)
-    preprocess_data(data, target_column, save_path, output_path)
+    return X_train, X_test, y_train, y_test
